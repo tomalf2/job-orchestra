@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "orchestra"
+version = "1.0.0"
+description = "The pipeline orchestration framework for data science workflows"
+authors = ["Tommaso Alfonsi"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+# refer to the environment.yml file 
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

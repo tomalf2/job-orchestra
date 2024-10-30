@@ -1,0 +1,21 @@
+name: orchestra
+channels:
+  - conda-forge
+  - anaconda
+  - conda
+  - defaults
+dependencies:
+  - jupyter>=1.1.1
+  - matplotlib>=3.9.2
+  - python=3.11
+  - python-fastjsonschema   # == fastjsonschema if using pip
+  - pyarrow>=17.0.0
+  - tqdm
+  - cleverdict>=1.9.2
+  - pathvalidate
+  - pytest
+  - flatdict>=4.0.1
+  - poetry
+  - pip
+  - pip:
+    - dagviz>=0.4.0

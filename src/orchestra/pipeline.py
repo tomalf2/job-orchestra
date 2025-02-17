@@ -321,6 +321,14 @@ class Step:
         s0.run = return_data
         return s0
 
+    @staticmethod
+    def stepify(output, *args, **kwargs):
+        s = Step(*args, **kwargs)
+        def run():
+            return output
+        s.run = run
+        return s
+
     # External interface
 
     def run(self, *args, **kwargs) -> Any:
@@ -435,10 +443,47 @@ class Step:
         A convenient function to force materialize a series of Steps. Returns a NoOp Step that depends on the argument dependencies. 
         Simply call .materialize() on the returned Step to materialize the arguments. 
         """
+        warnings.warn(message="noop_step is being renamed in 'join'", category=DeprecationWarning)
         class NoOpNode(Step):
             def run(self, *args):
                 return args
         return NoOpNode(depends_on=dependencies, name_alias=name_alias)
+    
+    @staticmethod
+    def join(dependencies: list["Step"], name_alias: Optional[str]=None) -> "Step":
+        """
+        A convenient function to join a list of Steps into one that can be materialized easily. Returns a NoOpNode Step that 
+        depends on the argument dependencies. Simply call .materialize() on the returned NoOpNode to materialize the arguments. 
+        """
+        class Join(Step):
+            def run(self, *args):
+                return args
+        return Join(depends_on=dependencies, name_alias=name_alias)
+    
+    # THIS IS COMMENTED TO REMIND ME WHY IT'S ACTUALLY A VERY BAD IDEA TO MATERIALIZE A LIST OF Steps UNDER THE HOOD. THEY MAY CAUSE 
+    # COMPUTATIONALLY/MEMORY INTENSIVE OPERATIONS POTENTIALLY STALLING THE MACHINE. 
+    # MATERIALIZING LIST OF STEPS IS GOOD, DOING IT "IMPLICITLY" LIKE IN THIS METHOD IS BAD. 
+    # ALSO, REMEMBER THAT ONE OF THE PURPOSES OF THIS LIBRARY IS TO MAKE THINGS SCALABLE. 
+    # 
+    # @staticmethod
+    # def split_result(dependency: "Step", name_aliases: Optional[str]=None, ctx: Optional[Context] = None) -> "Step":
+    #     """
+    #     A convenient function to transform the output list produced by a Step into a list of Steps. Returns a Piece Step that 
+    #     returns a piece of the result. 
+    #     This function forces the materialization of the argument dependency. The output of dependency must be a list. 
+    #     """
+    #     dependency_result = dependency.materialize()
+    #     if name_aliases:
+    #         assert len(name_aliases) == len(dependency_result), "The provided argument 'name_aliases' has a different length with respect the output of the argument 'dependency' Step."
+    #     else:
+    #         name_aliases = ["Piece_{i}" for i in range(len(dependency_result))]
+    #     class Piece(Step):
+    #         def __init__(self, result_index, *args, **kwargs):
+    #             super().__init__(*args, **kwargs)
+    #             self.result_index = result_index
+    #         def run(self, *args):
+    #             return dependency_result[self.result_index]
+    #     return [Piece(i, name_alias=name_aliases[i], ctx=ctx) for i in name_aliases]
 
     # Internal methods - data flow
 
@@ -501,7 +546,11 @@ class Step:
         """
         Warning, may very well contain duplicates as it reflects the call hierarchy from the last node to the first node(s)
         """
-        return [l2 for step in self.dependencies for l2 in [l1 for l1 in step._dependencies_depth_first()] + [step]]
+        try:
+            return [l2 for step in self.dependencies for l2 in [l1 for l1 in step._dependencies_depth_first()] + [step]]
+        except AttributeError:
+            warnings.warn(f"Error encountered while executing step {str(self)}")
+            raise
     
     def _dependencies_breadth_first(self) -> List["Step"]:
         """

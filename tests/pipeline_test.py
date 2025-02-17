@@ -2,7 +2,7 @@ from typing import Any, List, Iterable
 
 import sklearn.cluster
 import sklearn.decomposition
-from flu_dev_refact.pipeline import Context, Step
+from orchestra.pipeline import Context, Step
 from os import makedirs, getcwd, listdir
 from shutil import rmtree
 from os.path import exists, sep, abspath
@@ -10,7 +10,6 @@ import pandas as pd
 import numpy as np
 from pandas.testing import assert_frame_equal, assert_series_equal
 import pytest
-import matplotlib.pyplot as plt
 from cleverdict import CleverDict
 from flatdict import FlatDict
 import sklearn

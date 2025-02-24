@@ -1,4 +1,4 @@
-name: orchestra
+name: job-orchestra
 channels:
   - conda-forge
   - anaconda

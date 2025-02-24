@@ -1,9 +1,9 @@
-# Orchestra
-Orchestra is a pipeline orchestration framework designed for data science workflows.
+# Job-Orchestra
+job-orchestra is a pipeline orchestration framework designed for data science workflows.
 
 ## Quick start
 
-In Orchestra, you define any pipeline as a direct acyclic graph of Steps.
+In job-orchestra, you define any pipeline as a direct acyclic graph of Steps.
 
 ### Declare the pipeline steps and their dependencies
 
@@ -20,7 +20,7 @@ merge = PanFry(depends_on=[pasta, pour_tomatoes, basil])
 ```
 The pipeline always ends with a final `Step` (in this case, PanFry) that is the head of the pipeline.
 <center>
-<img src="docs/pasta_dependency_graph.png" alt="Dependency graph of the pasta recipe" width="400"/>
+<img src="https://github.com/tomalf2/job-orchestra/blob/main/docs/pasta_dependency_graph.png?raw=true" alt="Dependency graph of the pasta recipe" width="400"/>
 </center>
 
 <center>
@@ -35,6 +35,8 @@ The action performed by each `Step` is declared inside the subclass method `run(
 
 Here for example, `ingredients` is the list of the ouputs of the steps  `PourPasta`, `PourTomatoes` and `PickBasil`.
 ```python
+from job_orchestra import Step
+
 class PanFry(Step):
     def run(self, *ingredients):
         pan = pick_pan()
@@ -74,7 +76,7 @@ Calling `materialize()` on the last `Step` makes all the dependent steps to be e
 
 ## Memory persistency 
 
-Orchestra is a memoryless system by default. But if you'd like to:
+job-orchestra is a memoryless system by default. But if you'd like to:
 - **stop/resume development** - store the state of a pipeline to resume development at a later stage
 - **optimize the computation** - save the result of one or many intermediate `Step`s to avoid recomputing it whenever needed
 
@@ -82,6 +84,8 @@ you can create a `Context` object, and pass it to whatever `Step` you like. The 
 
 For example, let's consider the previous recipe and add a `Context` to PourTomatoes.
 ```python
+from job_orchestra import Context
+
 ctx = Context()
 pour_tomatoes = PourTomatoes(depends_on=[cut_tomatoes, brown_onions], ctx=ctx)
 merge = PanFry(depends_on=[pasta, pour_tomatoes, basil])
@@ -145,7 +149,7 @@ merge = PanFry(depends_on=[pasta, salt_tomatoes, basil])
 ```
 
 <center>
-<img src="docs/pasta_dependency_graph_name_alias.png" alt="Dependency graph of the pasta recipe with salty tomatoes" width="400"/>
+<img src="https://github.com/tomalf2/job-orchestra/blob/main/docs/pasta_dependency_graph_name_alias.png?raw=true" alt="Dependency graph of the pasta recipe with salty tomatoes" width="400"/>
 </center>
 
 <center>

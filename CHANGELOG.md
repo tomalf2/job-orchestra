@@ -1,4 +1,7 @@
-**1.1.2**
+**1.1.4**
+Fixes for the build system
+
+**1.1.3**
 Changed build system and package manager
 
 **1.1.1**

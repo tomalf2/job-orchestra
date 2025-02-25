@@ -1,13 +1,19 @@
 # Job-Orchestra
 job-orchestra is a pipeline orchestration framework designed for data science workflows.
 
+## Installation
+
+```bash
+pip install job-orchestra
+```
+
 ## Quick start
 
 In job-orchestra, you define any pipeline as a direct acyclic graph of Steps.
 
 ### Declare the pipeline steps and their dependencies
 
-Here is the recipe for a *pasta al pomodoro e basilico* as a sequence of steps. If a `Step` requires the completion of another one first, it is declared in the constructor argument `depends_on`.
+Here is the recipe for the *pasta al pomodoro e basilico* translated into a pipeline, i.e., a directed acyclic graph of steps, connected by their dependencies. The final `Step` is the head of the pipeline. If a `Step` requires the completion of another one first, it is declared in the constructor argument `depends_on`.
 ```python
 water = BoilWater()
 brown_onions = BrownOnions()
@@ -18,7 +24,6 @@ pasta = PourPasta(depends_on=salt)
 basil = PickBasil()
 merge = PanFry(depends_on=[pasta, pour_tomatoes, basil])
 ```
-The pipeline always ends with a final `Step` (in this case, PanFry) that is the head of the pipeline.
 <center>
 <img src="https://github.com/tomalf2/job-orchestra/blob/main/docs/pasta_dependency_graph.png?raw=true" alt="Dependency graph of the pasta recipe" width="400"/>
 </center>
@@ -29,9 +34,7 @@ The pipeline always ends with a final `Step` (in this case, PanFry) that is the 
 
 </center>
 
-
-### Implement the pipeline steps
-The action performed by each `Step` is declared inside the subclass method `run()`. The method receives as many arguments as the dependencies of the Step. 
+Any pipeline step must be of type `Step` and declare its action in the method `run()`. The method receives as many arguments as the dependencies of the Step. 
 
 Here for example, `ingredients` is the list of the ouputs of the steps  `PourPasta`, `PourTomatoes` and `PickBasil`.
 ```python
@@ -45,8 +48,8 @@ class PanFry(Step):
 ```
 
 ### Check the pipeline before execution
-- **As an image**: you can check the direct and indirect dependencies of a Step by calling `dependency_graph()`. For example, calling `merge.dependency_graph()` **produces the above image**. 
-- **As plain text**: you can inspect the list of Steps that are going to be executed by the pipeline with the subclass method `execution_plan()`. 
+- **As an image**: by calling `dependency_graph()`. For example, calling `merge.dependency_graph()` **produces the above image**. 
+- **As plain text**: by calling `execution_plan()`. 
 
     ```
     Execution plan. Result availability: [*] available - [ ] n/a - [x] no context. 
@@ -63,7 +66,7 @@ class PanFry(Step):
 
     The plan contains one row for each `Step`. The name of the step is preceded by two symbols whose meaning is explained further down in Section [Memory persistence](#memory-persistency).
 
-Both methods tell which stages are seen by the current head (PanFry) based on the dependencies stated before. If you decide to add one last `Step` to the pipeline, you should use any of `dependency_graph()`, `execution_plan()` or `materialize()` on the new `Step` instead.
+To get a complete view of the pipeline, you should always call any of the above methods on the head of the pipeline, not on the intermediate steps. 
 
 ### Execute the pipeline
 Finally, you execute the recipe with 

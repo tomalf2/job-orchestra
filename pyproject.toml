@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "job-orchestra"
-version = "1.1.2"
+version = "1.1.4"
 description = "The pipeline orchestration framework for data science workflows"
 authors = [{name = "Tommaso Alfonsi"}]
 readme = "README.md"
@@ -45,30 +45,12 @@ Homepage = "https://github.com/tomalf2/job-orchestra/"
 Source = "https://github.com/tomalf2/job-orchestra/"
 
 [tool.hatch.build]
-packages = ["src/job_orchestra"]  # the actual package name(s) when doing import package_name
-include = [
-    "src",      # .gitignore is always included by hatchlings and cannot be excluded
-    "README.*",
-    "pyproject.toml",
-    "LICENSE",
-    "CHANGELOG.*",
-]
 exclude = [
     # everything included in the .gitgnore +
+    "tests/",
+    "docs/",
+    "*.md",     # README.md is included because part of the package documentation on Pypi. Exclude other .md files. 
 ]
-
-#[tool.hatch.build.targets.sdist]
-#exclude = [
-#  ".*",
-#  ".gitignore",
-#  "*.yml",
-#  "docs",
-#  "tests",
-#  "dist",
-#]
-
-#[tool.hatch.build.targets.wheel]
-#packages = ["src/job_orchestra"]
 
 [[tool.uv.index]]
 name = "pypi"
